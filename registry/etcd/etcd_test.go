@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/ibinarytree/koala/registry"
+	"github.com/koala/registry"
 )
 
 func TestRegister(t *testing.T) {
