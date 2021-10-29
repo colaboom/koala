@@ -48,7 +48,6 @@ var (
 )
 
 func init() {
-
 	allServiceInfo := &AllServiceInfo{
 		serviceMap: make(map[string]*registry.Service, MaxServiceNum),
 	}
@@ -148,6 +147,7 @@ func (e *EtcdRegistry) keepAlive(registryService *RegisterService) {
 			registryService.registered = false
 			return
 		}
+		fmt.Printf("service:%s, ip:%s, port:%v\n", registryService.service.Name, registryService.service.Nodes[0].IP, registryService.service.Nodes[0].Port)
 	}
 	return
 }

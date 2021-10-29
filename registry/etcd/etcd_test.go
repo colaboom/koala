@@ -2,7 +2,6 @@ package etcd
 
 import (
 	"context"
-	"fmt"
 	"testing"
 	"time"
 
@@ -10,11 +9,11 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-
+	// 初始化注册中心
 	registryInst, err := registry.InitRegistry(context.TODO(), "etcd",
 		registry.WithAddrs([]string{"127.0.0.1:2379"}),
 		registry.WithTimeout(time.Second),
-		registry.WithRegistryPath("/ibinarytree/koala/"),
+		registry.WithRegistryPath("/colaboom/koala/"),
 		registry.WithHeartBeat(5),
 	)
 	if err != nil {
@@ -26,17 +25,21 @@ func TestRegister(t *testing.T) {
 		Name: "comment_service",
 	}
 
-	service.Nodes = append(service.Nodes, &registry.Node{
-		IP:   "127.0.0.1",
-		Port: 8801,
-	},
+	service.Nodes = append(service.Nodes,
+		&registry.Node{
+			IP:   "127.0.0.1",
+			Port: 8801,
+		},
 		&registry.Node{
 			IP:   "127.0.0.2",
 			Port: 8801,
 		},
 	)
 	registryInst.Register(context.TODO(), service)
-	go func() {
+	for {
+		time.Sleep(time.Second)
+	}
+	/*go func() {
 		time.Sleep(time.Second * 10)
 		service.Nodes = append(service.Nodes, &registry.Node{
 			IP:   "127.0.0.3",
@@ -61,5 +64,5 @@ func TestRegister(t *testing.T) {
 		}
 		fmt.Println("\n\n")
 		time.Sleep(time.Second * 5)
-	}
+	}*/
 }
