@@ -36,6 +36,7 @@ type AllServiceInfo struct {
 type RegisterService struct {
 	id          clientv3.LeaseID
 	service     *registry.Service
+	// 服务是否注册到etcd
 	registered  bool
 	keepAliveCh <-chan *clientv3.LeaseKeepAliveResponse
 }
@@ -213,8 +214,7 @@ func (e *EtcdRegistry) getServiceFromCache(ctx context.Context,
 	return
 }
 
-func (e *EtcdRegistry) GetService(ctx context.Context,
-	name string) (service *registry.Service, err error) {
+func (e *EtcdRegistry) GetService(ctx context.Context, name string) (service *registry.Service, err error) {
 
 	//一般情况下，都会从缓存中读取
 	service, ok := e.getServiceFromCache(ctx, name)
@@ -303,6 +303,7 @@ func (e *EtcdRegistry) syncServiceFromEtcd() {
 			for _, node := range tmpService.Nodes {
 				serviceNew.Nodes = append(serviceNew.Nodes, node)
 			}
+
 		}
 		allServiceInfoNew.serviceMap[serviceNew.Name] = serviceNew
 	}
