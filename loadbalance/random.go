@@ -29,5 +29,18 @@ func (b *RandomBalance) Select(ctx context.Context, nodes []*registry.Node) (nod
 	}
 	curWeight := rand.Intn(totalWeight)
 	curIndex := -1
+	for index, node := range nodes {
+		curWeight -= node.Weight
+		if curWeight < 0 {
+			curIndex = index
+			break
+		}
+	}
+
+	if curIndex == -1 {
+		err = errno.NotHaveInstance
+	}
+
+	node = nodes[curIndex]
 	return
 }
