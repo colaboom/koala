@@ -1,8 +1,11 @@
 package main
 
 import (
-	"context"
 	pb "github.com/koala/example/grpc_example/hello"
+	"golang.org/x/net/context"
+	"google.golang.org/grpc"
+	"log"
+	"net"
 )
 
 const (
@@ -18,5 +21,12 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 }
 
 func main() {
+	listen, err := net.Listen("tcp", port)
+	if err != nil {
+		log.Fatal("failed to listen :%v", err)
+	}
 
+	s := grpc.NewServer()
+	pb.RegisterHelloServiceServer(s, &server{})
+	s.Serve(listen)
 }
