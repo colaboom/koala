@@ -11,8 +11,9 @@ type GeneratorMgr struct {
 }
 
 func (g *GeneratorMgr) Run(opt *Option) (err error) {
+	var metaData = &ServiceMetaData{}
 	for _, gen := range g.genMap {
-		err = gen.Run(opt)
+		err = gen.Run(opt, metaData)
 		if err != nil {
 			return
 		}

@@ -10,7 +10,7 @@ type GrpcGenerator struct {
 	dirList []string
 }
 
-func (d *GrpcGenerator) Run(opt *Option) (err error) {
+func (d *GrpcGenerator) Run(opt *Option, metaData *ServiceMetaData) (err error) {
 	// protoc --go_out=plugins=grpc:. hello.proto
 	outputParams := fmt.Sprintf("plugins=grpc:%s/generate/", opt.Output)
 	cmd := exec.Command("protoc", "--go_out", outputParams, opt.Proto3Filename)
