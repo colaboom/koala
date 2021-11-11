@@ -2,7 +2,9 @@ package main
 
 import "fmt"
 
-var genMgr *GeneratorMgr
+var genMgr = &GeneratorMgr{
+	genMap: make(map[string]Generator),
+}
 
 type GeneratorMgr struct {
 	genMap map[string]Generator
@@ -16,12 +18,6 @@ func (g *GeneratorMgr) Run(opt *Option) (err error) {
 		}
 	}
 	return
-}
-
-func init() {
-	genMgr = &GeneratorMgr{
-		genMap: make(map[string]Generator),
-	}
 }
 
 func Register(name string, gen Generator) (err error) {
