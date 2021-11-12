@@ -10,4 +10,6 @@ type ServiceMetaData struct {
 	Service *proto.Service
 	Message []*proto.Message
 	Rpc     []*proto.RPC
+	Package *proto.Package
+	Prefix  string
 }

@@ -5,12 +5,19 @@ import (
 	"github.com/emicklei/proto"
 	"os"
 	"path"
+	"text/template"
 )
 
 type CtrlGenerator struct {
-	service *proto.Service
+	/*service *proto.Service
 	message []*proto.Message
-	rpc     []*proto.RPC
+	rpc     []*proto.RPC*/
+}
+
+type RpcMeta struct {
+	Rpc     *proto.RPC
+	Package *proto.Package
+	Prefix  string
 }
 
 func (d *CtrlGenerator) Run(opt *Option, metaData *ServiceMetaData) (err error) {
@@ -21,61 +28,42 @@ func (d *CtrlGenerator) Run(opt *Option, metaData *ServiceMetaData) (err error) 
 	}
 	defer reader.Close()
 
-	parser := proto.NewParser(reader)
-	definition, err := parser.Parse()
-	if err != nil {
-		fmt.Printf("parse file %s failed,err:%v\n", opt.Proto3Filename, err)
-	}
-
-	proto.Walk(definition,
-		proto.WithService(d.handleService),
-		proto.WithMessage(d.handleMessage),
-		proto.WithRPC(d.handleRPC))
-
-	//fmt.Printf("parse protoc succ, rpc:%#v\n", d.rpc)
-	return d.generateRpc(opt)
+	return d.generateRpc(opt, metaData)
 }
 
-func (d *CtrlGenerator) generateRpc(opt *Option) (err error) {
-	filename := path.Join(opt.Output, "controller", fmt.Sprintf("%s.go", d.service.Name))
-	file, err := os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
-	if err != nil {
-		fmt.Printf("open file %s failed, err : %v\n", filename, err)
-	}
-	defer file.Close()
-
-	fmt.Fprintf(file, "package controller\n")
-	fmt.Fprintln(file)
-	fmt.Fprintf(file, "import(\n")
-	fmt.Fprintf(file, `"golang.org/x/net/context"`)
-	fmt.Fprintln(file)
-	fmt.Fprintf(file, `"github.com/koala/tools/koala/output/generate"`)
-	fmt.Fprintln(file)
-	fmt.Fprintf(file, ")\n")
-	fmt.Fprintf(file, "type Server struct{}\n")
-	fmt.Fprintf(file, "\n")
-	for _, rpc := range d.rpc {
-		fmt.Fprintf(file, "func (s *Server) %s(ctx context.Context, r *hello.%s)(resp *hello.%s, err error){\nreturn\n}\n", rpc.Name, rpc.RequestType, rpc.ReturnsType)
+func (d *CtrlGenerator) generateRpc(opt *Option, metaData *ServiceMetaData) (err error) {
+	for _, rpc := range metaData.Rpc {
+		var file *os.File
+		filename := path.Join(opt.Output, "controller", fmt.Sprintf("%s.go", rpc.Name))
+		file, err = os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
+		if err != nil {
+			fmt.Printf("open file %s failed, err : %v\n", filename, err)
+		}
+		rpcMeta := &RpcMeta{}
+		rpcMeta.Rpc = rpc
+		rpcMeta.Package = metaData.Package
+		rpcMeta.Prefix = metaData.Prefix
+		err = d.render(file, controller_template, rpcMeta)
+		if err != nil {
+			fmt.Printf("render controller failed,err :%v\n", err)
+			return
+		}
+		defer file.Close()
 	}
 	return
 }
 
-func (d *CtrlGenerator) handleService(s *proto.Service) {
-	//fmt.Println(s.Name)
-	d.service = s
-}
-
-func (d *CtrlGenerator) handleMessage(m *proto.Message) {
-	//fmt.Println(m.Name)
-	d.message = append(d.message, m)
-}
-
-func (d *CtrlGenerator) handleRPC(r *proto.RPC) {
-	/*fmt.Println(r.Name)
-	fmt.Println(r.RequestType)
-	fmt.Println(r.ReturnsType)
-	fmt.Printf("rpc:%#v, comment:%v\n", r, r.Comment)*/
-	d.rpc = append(d.rpc, r)
+func (d *CtrlGenerator) render(file *os.File, data string, rpcMeta *RpcMeta) (err error) {
+	t := template.New("main")
+	t, err = t.Parse(data)
+	if err != nil {
+		return
+	}
+	err = t.Execute(file, rpcMeta)
+	if err != nil {
+		return
+	}
+	return
 }
 
 func init() {

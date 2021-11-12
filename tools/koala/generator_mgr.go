@@ -27,6 +27,7 @@ var AllDirList []string = []string{
 	"app/config",
 	"model",
 	"generate",
+	"router",
 }
 
 func (g *GeneratorMgr) parseService(opt *Option) (err error) {
@@ -46,7 +47,8 @@ func (g *GeneratorMgr) parseService(opt *Option) (err error) {
 	proto.Walk(definition,
 		proto.WithService(g.handleService),
 		proto.WithMessage(g.handleMessage),
-		proto.WithRPC(g.handleRPC))
+		proto.WithRPC(g.handleRPC),
+		proto.WithPackage(g.handlePackage))
 
 	return
 }
@@ -69,6 +71,10 @@ func (g *GeneratorMgr) handleRPC(r *proto.RPC) {
 	g.metaData.Rpc = append(g.metaData.Rpc, r)
 }
 
+func (g *GeneratorMgr) handlePackage(p *proto.Package) {
+	g.metaData.Package = p
+}
+
 func (g *GeneratorMgr) createAllDir(opt *Option) (err error) {
 	for _, dir := range AllDirList {
 		fullDir := path.Join(opt.Output, dir)
@@ -81,6 +87,18 @@ func (g *GeneratorMgr) createAllDir(opt *Option) (err error) {
 	return
 }
 
+func (g *GeneratorMgr) initOutputDir(opt *Option)/* (err error)*/ {
+	// 指定路径
+	if len(opt.Prefix) > 0{
+		goPath := os.Getenv("GOPATH")
+		opt.Output = path.Join(goPath,"/src/",opt.Prefix)
+		return
+	}
+
+	// 没有指定路径，就用当前路径
+
+}
+
 func (g *GeneratorMgr) Run(opt *Option) (err error) {
 	err = g.parseService(opt)
 	if err != nil {
@@ -90,6 +108,8 @@ func (g *GeneratorMgr) Run(opt *Option) (err error) {
 	if err != nil {
 		return
 	}
+	g.initOutputDir(opt)
+	g.metaData.Prefix = opt.Prefix
 	for _, gen := range g.genMap {
 		err = gen.Run(opt, g.metaData)
 		if err != nil {
