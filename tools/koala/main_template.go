@@ -20,7 +20,7 @@ func main() {
 	}
 	
 	s := grpc.NewServer()
-	hello.RegisterHelloServiceServer(s, server)
+	hello.Register{{.Service.Name}}Server(s, server)
 	s.Serve(listen)
 }
 `

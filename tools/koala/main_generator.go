@@ -18,7 +18,7 @@ func (d *MainGenerator) Run(opt *Option, metaData *ServiceMetaData) (err error) 
 		return
 	}
 	defer file.Close()
-	err = d.render(file, main_template)
+	err = d.render(file, main_template, metaData)
 	if err != nil {
 		fmt.Printf("render failed, err :%v\n", err)
 		return
@@ -27,13 +27,13 @@ func (d *MainGenerator) Run(opt *Option, metaData *ServiceMetaData) (err error) 
 	return
 }
 
-func (d *MainGenerator) render(file *os.File, data string) (err error) {
+func (d *MainGenerator) render(file *os.File, data string, metadata *ServiceMetaData) (err error) {
 	t := template.New("main")
 	t, err = t.Parse(data)
 	if err != nil {
 		return
 	}
-	err = t.Execute(file, nil)
+	err = t.Execute(file, metadata)
 	if err != nil {
 		return
 	}
