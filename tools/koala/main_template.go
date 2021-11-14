@@ -7,10 +7,18 @@ import(
 	"net"
 	"log"
 	"google.golang.org/grpc"
-	"github.com/koala/tools/koala/output/controller"
-	hello "github.com/koala/tools/koala/output/generate"
+	{{if not .Prefix}}
+	"router"
+	{{else}}
+	"{{.Prefix}}/router"
+	{{end}}
+	{{if not .Prefix}}
+	"generate/{{.Package.Name}}"
+	{{else}}
+	"{{.Prefix}}/generate/{{.Package.Name}}"
+	{{end}}
 )
-var server = &controller.Server{}
+var server = &router.RouterServer{}
 var port = ":12345"
 
 func main() {

@@ -5,6 +5,9 @@ import (
 	"github.com/emicklei/proto"
 	"os"
 	"path"
+	"path/filepath"
+	"runtime"
+	"strings"
 )
 
 var genMgr = &GeneratorMgr{
@@ -87,16 +90,39 @@ func (g *GeneratorMgr) createAllDir(opt *Option) (err error) {
 	return
 }
 
-func (g *GeneratorMgr) initOutputDir(opt *Option)/* (err error)*/ {
+func (g *GeneratorMgr) initOutputDir(opt *Option) /* (err error)*/ {
+	goPath := os.Getenv("GOPATH")
 	// 指定路径
-	if len(opt.Prefix) > 0{
-		goPath := os.Getenv("GOPATH")
-		opt.Output = path.Join(goPath,"/src/",opt.Prefix)
+	if len(opt.Prefix) > 0 {
+		opt.Output = path.Join(goPath, "src", opt.Prefix)
 		return
 	}
 
 	// 没有指定路径，就用当前路径
+	exeFilePath, err := filepath.Abs(os.Args[0])
+	if err != nil {
+		return
+	}
 
+	if runtime.GOOS == "windows" {
+		exeFilePath = strings.Replace(exeFilePath, "\\", "/", -1)
+	}
+
+	lastIdx := strings.LastIndex(exeFilePath, "/")
+	if lastIdx < 0 {
+		err = fmt.Errorf("invalid exe exeFilePath:%v", exeFilePath)
+		return
+	}
+
+	tmpGoPath := strings.ToLower(goPath)
+	tmpGoPath = strings.Replace(tmpGoPath, "\\", "/", -1)
+	opt.Output = strings.ToLower(exeFilePath[0:lastIdx])
+	srcPath := path.Join(tmpGoPath, "src/")
+	if srcPath[len(srcPath)-1] != '/' {
+		srcPath = fmt.Sprintf("%s/", srcPath)
+	}
+	opt.Prefix = strings.Replace(opt.Output, srcPath, "", -1)
+	return
 }
 
 func (g *GeneratorMgr) Run(opt *Option) (err error) {
@@ -104,11 +130,11 @@ func (g *GeneratorMgr) Run(opt *Option) (err error) {
 	if err != nil {
 		return
 	}
+	g.initOutputDir(opt)
 	err = g.createAllDir(opt)
 	if err != nil {
 		return
 	}
-	g.initOutputDir(opt)
 	g.metaData.Prefix = opt.Prefix
 	for _, gen := range g.genMap {
 		err = gen.Run(opt, g.metaData)

@@ -6,9 +6,9 @@ package router
 import (
 	"golang.org/x/net/context"
 	{{if not .Prefix}}
-	"{{.Package.Name}}"
+	"generate/{{.Package.Name}}"
 	{{else}}
-	{{.Package.Name}} "{{.Prefix}}/generate"
+	"{{.Prefix}}/generate/{{.Package.Name}}"
 	{{end}}
 
 	{{if not .Prefix}}
@@ -21,7 +21,7 @@ import (
 type RouterServer struct{}
 
 {{range .Rpc}}
-func(s *RouterServer) {{.Name}}(ctx context.Context, r *{{$.Package.Name}}.{{.RequestType}})(resp *{{$.Package.Name}}.{{.ReturnsType}})
+func(s *RouterServer) {{.Name}}(ctx context.Context, r *{{$.Package.Name}}.{{.RequestType}})(resp *{{$.Package.Name}}.{{.ReturnsType}}, err error){
 	ctrl :=&controller.{{.Name}}Controller{}
 	err = ctrl.CheckParams(ctx, r)
 	if err != nil {

@@ -6,15 +6,15 @@ package controller
 import(
 	"golang.org/x/net/context"
 	{{if not .Prefix}}
-	"{{.Package.Name}}"
+	"generate/ {{.Package.Name}}"
 	{{else}}
-	{{.Package.Name}} "{{.Prefix}}/generate"
+	"{{.Prefix}}/generate/{{.Package.Name}}"
 	{{end}}
 )
 
 type {{.Rpc.Name}}Controller struct{}
 //检查参数
-func (s *{{.Rpc.Name}}Controller) checkParams(ctx context.Context, r *{{$.Package.Name}}.{{.Rpc.RequestType}}) (err error) {
+func (s *{{.Rpc.Name}}Controller) CheckParams(ctx context.Context, r *{{$.Package.Name}}.{{.Rpc.RequestType}}) (err error) {
 	return
 }
 
