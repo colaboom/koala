@@ -57,24 +57,25 @@ func (g *GeneratorMgr) parseService(opt *Option) (err error) {
 }
 
 func (g *GeneratorMgr) handleService(s *proto.Service) {
-	//fmt.Println(s.Name)
+	//fmt.Println("serviceName:", s.Name)
 	g.metaData.Service = s
 }
 
 func (g *GeneratorMgr) handleMessage(m *proto.Message) {
-	//fmt.Println(m.Name)
+	//fmt.Println("messageName:", m.Name)
 	g.metaData.Message = append(g.metaData.Message, m)
 }
 
 func (g *GeneratorMgr) handleRPC(r *proto.RPC) {
-	/*fmt.Println(r.Name)
-	fmt.Println(r.RequestType)
-	fmt.Println(r.ReturnsType)
-	fmt.Printf("rpc:%#v, comment:%v\n", r, r.Comment)*/
+	//fmt.Println("rpcName", r.Name)
+	//fmt.Println("rpcRequestType", r.RequestType)
+	//fmt.Println("rpcReturnType", r.ReturnsType)
+	//fmt.Printf("rpc:%#v, comment:%v\n", r, r.Comment)
 	g.metaData.Rpc = append(g.metaData.Rpc, r)
 }
 
 func (g *GeneratorMgr) handlePackage(p *proto.Package) {
+	//fmt.Println("packageName", p.Name)
 	g.metaData.Package = p
 }
 
