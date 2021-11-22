@@ -22,6 +22,8 @@ type RouterServer struct{}
 
 {{range .Rpc}}
 func(s *RouterServer) {{.Name}}(ctx context.Context, r *{{$.Package.Name}}.{{.RequestType}})(resp *{{$.Package.Name}}.{{.ReturnsType}}, err error){
+	ctx = meta.InitServerMeta(ctx, "{{$.Package.Name}}", "{{.Name}}")
+
 	ctrl :=&controller.{{.Name}}Controller{}
 	err = ctrl.CheckParams(ctx, r)
 	if err != nil {
