@@ -4,6 +4,10 @@ import (
 	"context"
 )
 
+var (
+	userMiddleware []Middleware
+)
+
 type MiddlewareFunc func(ctx context.Context, req interface{}) (resp interface{}, err error)
 
 type Middleware func(MiddlewareFunc) MiddlewareFunc
@@ -17,26 +21,24 @@ func Chain(outer Middleware, others ...Middleware) Middleware {
 	}
 }
 
-/*func BuildServerMiddleware(handle MiddlewareFunc) MiddlewareFunc {
+func Use(m ...Middleware) {
+	userMiddleware = append(userMiddleware, m...)
+}
+
+func BuildServerMiddleware(handle MiddlewareFunc) MiddlewareFunc {
 	var mids []Middleware
 
-	mids = append(mids, AccessLogMiddleware)
-	if koalaConf.Prometheus.SwitchOn {
-		mids = append(mids, PrometheusServerMiddleware)
+	mids = append(mids, PrometheusServerMiddleware)
+
+	if len(userMiddleware) != 0 {
+		mids = append(mids, userMiddleware...)
 	}
 
-	if koalaConf.Limit.SwitchOn {
-		mids = append(mids, NewRateLimitMiddleware(koalaServer.limiter))
+	if len(mids) > 0 {
+		m := Chain(mids[0], mids[1:]...)
+		return m(handle)
 	}
 
-	if koalaConf.Trace.SwitchOn {
-		mids = append(mids, TraceServerMiddleware)
-	}
-
-	if len(koalaServer.userMiddleware) != 0 {
-		mids = append(mids, koalaServer.userMiddleware...)
-	}
-
-	m := Chain(PrepareMiddleware, mids...)
+	m := Chain(mids[0])
 	return m(handle)
-}*/
+}

@@ -20,6 +20,9 @@ func (s *{{.Rpc.Name}}Controller) CheckParams(ctx context.Context, r *{{$.Packag
 
 //SayHello函数的实现
 func (s *{{.Rpc.Name}}Controller) Run(ctx context.Context, r *{{$.Package.Name}}.{{.Rpc.RequestType}}) (resp *{{$.Package.Name}}.{{.Rpc.ReturnsType}}, err error){
+	resp = &hello.HelloResponse{
+		Reply: "say hello to " + r.Name,
+	}
 	return
 }
 `

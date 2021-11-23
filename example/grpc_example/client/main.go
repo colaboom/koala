@@ -32,6 +32,6 @@ func main() {
 			log.Fatal("could not greet :%v", err)
 		}
 		log.Printf("Greeting: %s", resp.Reply)
-		time.Sleep(time.Second)
+		time.Sleep(time.Millisecond * 10)
 	}
 }
