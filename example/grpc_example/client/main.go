@@ -6,10 +6,11 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"os"
+	"time"
 )
 
 const (
-	address     = "localhost:50051"
+	address     = "localhost:12345"
 	defaultName = "colaboom"
 )
 
@@ -25,9 +26,12 @@ func main() {
 	if len(os.Args) > 1 {
 		name = os.Args[1]
 	}
-	resp, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: name})
-	if err != nil {
-		log.Fatal("could not greet :%v", err)
+	for {
+		resp, err := c.SayHello(context.Background(), &pb.HelloRequest{Name: name})
+		if err != nil {
+			log.Fatal("could not greet :%v", err)
+		}
+		log.Printf("Greeting: %s", resp.Reply)
+		time.Sleep(time.Second)
 	}
-	log.Printf("Greeting: %s", resp.Reply)
 }

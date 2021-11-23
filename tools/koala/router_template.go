@@ -5,6 +5,8 @@ package router
 
 import (
 	"golang.org/x/net/context"
+	//"github.com/koala/middleware"
+	"github.com/koala/meta"
 	{{if not .Prefix}}
 	"generate/{{.Package.Name}}"
 	{{else}}
@@ -22,11 +24,13 @@ type RouterServer struct{}
 
 {{range .Rpc}}
 func(s *RouterServer) {{.Name}}(ctx context.Context, r *{{$.Package.Name}}.{{.RequestType}})(resp *{{$.Package.Name}}.{{.ReturnsType}}, err error){
-	ctx = meta.InitServerMeta(ctx, "{{$.Package.Name}}", "{{.Name}}")
-	mwFunc := middleware.BuildServerMiddleware(mw{{.Name}})
+	ctx = meta.InitServerMeta(ctx, "hello", "SayHello")
+	/*mwFunc := middleware.BuildServerMiddleware(mwSayHello)
 	mwResp, err := mwFunc(ctx, r)
 
-	resp = mwResp.(*{{$.Package.Name}}.{{.ReturnsType}})
+	resp = mwResp.(*hello.HelloResponse)*/
+	respTmp, err := mwSayHello(ctx, r)
+	resp = respTmp.(*hello.HelloResponse)
 	return
 }
 

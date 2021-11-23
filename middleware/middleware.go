@@ -1,6 +1,8 @@
 package middleware
 
-import "context"
+import (
+	"context"
+)
 
 type MiddlewareFunc func(ctx context.Context, req interface{}) (resp interface{}, err error)
 
@@ -14,3 +16,27 @@ func Chain(outer Middleware, others ...Middleware) Middleware {
 		return outer(next)
 	}
 }
+
+/*func BuildServerMiddleware(handle MiddlewareFunc) MiddlewareFunc {
+	var mids []Middleware
+
+	mids = append(mids, AccessLogMiddleware)
+	if koalaConf.Prometheus.SwitchOn {
+		mids = append(mids, PrometheusServerMiddleware)
+	}
+
+	if koalaConf.Limit.SwitchOn {
+		mids = append(mids, NewRateLimitMiddleware(koalaServer.limiter))
+	}
+
+	if koalaConf.Trace.SwitchOn {
+		mids = append(mids, TraceServerMiddleware)
+	}
+
+	if len(koalaServer.userMiddleware) != 0 {
+		mids = append(mids, koalaServer.userMiddleware...)
+	}
+
+	m := Chain(PrepareMiddleware, mids...)
+	return m(handle)
+}*/

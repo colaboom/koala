@@ -8,6 +8,7 @@ import(
 	"log"
 	"google.golang.org/grpc"
     "github.com/prometheus/client_golang/prometheus/promhttp"
+	"net/http"
 	{{if not .Prefix}}
 	"router"
 	{{else}}
@@ -26,7 +27,7 @@ func main() {
 
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
-		log.Fatal(http.ListenAndServer("0.0.0.0:9091", nil))
+		log.Fatal(http.ListenAndServe("0.0.0.0:9091", nil))
 	}()
 
 	listen, err := net.Listen("tcp", port)
