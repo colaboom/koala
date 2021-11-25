@@ -14,7 +14,26 @@ import (
 )
 
 var (
-	koalaConf = &KoalaConf{}
+	// 默认配置
+	koalaConf = &KoalaConf{
+		Port: 8080,
+		Prometheus: PrometheusConf{
+			SwitchOn: true,
+			Port:     8081,
+		},
+		ServiceName: "koala_server",
+		Regiser: RegisterConf{
+			SwitchOn: false,
+		},
+		Log: LogConf{
+			Level: "debug",
+			Dir:   "./logs/",
+		},
+		Limit: LimitConf{
+			SwitchOn: true,
+			QPSLimit: 50000,
+		},
+	}
 )
 
 type KoalaConf struct {
