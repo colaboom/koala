@@ -110,7 +110,7 @@ func writeLog(ctx context.Context, level LogLevel, format string, args ...interf
 		level:       level,
 		filename:    filename,
 		lineNo:      lineNo,
-		traceId:     GetTraceId(),
+		traceId:     GetTraceId(ctx),
 		serviceName: lm.serviceName,
 	}
 

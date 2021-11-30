@@ -23,6 +23,7 @@ func GenTraceId() (traceId string) {
 	return
 }
 
+// 如果有traceId，就用带过来的traceId
 func GetTraceId(ctx context.Context) (traceId string) {
 	traceId, ok := ctx.Value(traceIdKey{}).(string)
 	if !ok {

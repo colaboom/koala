@@ -11,6 +11,9 @@ const (
 
 const (
 	DefaultLogChanSize = 20000
+	SpaceSep           = " "
+	ColonSep           = ":"
+	LineSep            = "\n"
 )
 
 type LogLevel int
@@ -51,4 +54,23 @@ func getLevel(levelText string) LogLevel {
 	}
 
 	return LogLevelDebug
+}
+
+func getLevelColor(level LogLevel) Color {
+	switch level {
+	case LogLevelDebug:
+		return White
+	case LogLevelTrace:
+		return Yellow
+	case LogLevelAccess:
+		return Green
+	case LogLevelInfo:
+		return Blue
+	case LogLevelWarn:
+		return Cyan
+	case LogLevelError:
+		return Red
+	}
+
+	return Magenta
 }
