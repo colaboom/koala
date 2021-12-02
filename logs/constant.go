@@ -37,7 +37,7 @@ func getLevelText(level LogLevel) string {
 	return "UNKNOWN"
 }
 
-func getLevel(levelText string) LogLevel {
+func GetLogLevel(levelText string) LogLevel {
 	switch levelText {
 	case "debug":
 		return LogLevelDebug

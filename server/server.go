@@ -1,8 +1,13 @@
 package server
 
 import (
+	"context"
 	"fmt"
+	"github.com/koala/logs"
 	"github.com/koala/middleware"
+	"github.com/koala/registry"
+	_ "github.com/koala/registry/etcd"
+	"github.com/koala/util"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
@@ -13,7 +18,8 @@ import (
 
 type KoalaServer struct {
 	*grpc.Server
-	limiter *rate.Limiter
+	limiter  *rate.Limiter
+	register registry.Registry
 
 	userMiddleware []middleware.Middleware
 }
@@ -26,16 +32,80 @@ func Use(m ...middleware.Middleware) {
 	koalaServer.userMiddleware = append(koalaServer.userMiddleware, m...)
 }
 
-func Init(serverName string) (err error) {
-	err = InitConfig(serverName)
+func Init(serviceName string) (err error) {
+	err = InitConfig(serviceName)
 	if err != nil {
 		return
 	}
 
+	// 初始化限流器
 	if koalaConf.Limit.SwitchOn {
 		koalaServer.limiter = rate.NewLimiter(rate.Limit(koalaConf.Limit.QPSLimit), koalaConf.Limit.QPSLimit)
 	}
 
+	// 初始化日志
+	initLogger()
+
+	// 初始化注册中心
+	err = initRegister(serviceName)
+	if err != nil {
+		logs.Error(context.TODO(), "init register failed , err :%v", err)
+		return
+	}
+
+	return
+}
+
+func initLogger() (err error) {
+	filename := fmt.Sprintf("%s/%s.log", koalaConf.Log.Dir, koalaConf.ServiceName)
+	outputer, err := logs.NewFileOutputer(filename)
+	if err != nil {
+		return
+	}
+
+	level := logs.GetLogLevel(koalaConf.Log.Level)
+	logs.InitLogger(level, koalaConf.Log.ChanSize, koalaConf.ServiceName)
+	logs.AddOutputer(outputer)
+
+	if koalaConf.Log.ConsoleLog {
+		logs.AddOutputer(logs.NewConsoleOutputer())
+	}
+	return
+}
+
+func initRegister(serviceName string) (err error) {
+	if !koalaConf.Register.SwitchOn {
+		return
+	}
+
+	ctx := context.TODO()
+	registryInst, err := registry.InitRegistry(ctx, koalaConf.Register.RegisterName,
+		registry.WithAddrs([]string{koalaConf.Register.RegisterAddr}),
+		registry.WithHeartBeat(koalaConf.Register.HeartBeat),
+		registry.WithRegistryPath(koalaConf.Register.RegisterPath),
+		registry.WithTimeout(koalaConf.Register.Timeout),
+	)
+	if err != nil {
+		logs.Error(ctx, "init register failed, err :%v", err)
+		return
+	}
+
+	koalaServer.register = registryInst
+	service := &registry.Service{
+		Name: serviceName,
+	}
+
+	ip, err := util.GetLocalIP()
+	if err != nil {
+		logs.Error(ctx, "get local ip failed, err :%v", err)
+		return
+	}
+	service.Nodes = append(service.Nodes, &registry.Node{
+		IP:   ip,
+		Port: koalaConf.Port,
+	})
+
+	registryInst.Register(ctx, service)
 	return
 }
 

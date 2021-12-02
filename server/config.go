@@ -22,7 +22,7 @@ var (
 			Port:     8081,
 		},
 		ServiceName: "koala_server",
-		Regiser: RegisterConf{
+		Register: RegisterConf{
 			SwitchOn: false,
 		},
 		Log: LogConf{
@@ -40,7 +40,7 @@ type KoalaConf struct {
 	Port        int            `yaml:"port"`
 	Prometheus  PrometheusConf `yaml:"prometheus"`
 	ServiceName string         `yaml:"service_name"`
-	Regiser     RegisterConf   `yaml:"register"`
+	Register     RegisterConf   `yaml:"register"`
 	Log         LogConf        `yaml:"log"`
 	Limit       LimitConf      `yaml:"limit"`
 

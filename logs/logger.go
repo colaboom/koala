@@ -68,28 +68,41 @@ func AddOutputer(outputer Outputer) {
 	return
 }
 
-func Debug(ctx context.Context, level LogLevel, format string, args ...interface{}) {
-	writeLog(ctx, LogLevelDebug, format, args)
+func Debug(ctx context.Context, format string, args ...interface{}) {
+	writeLog(ctx, LogLevelDebug, format, args...)
 }
 
-func Trace(ctx context.Context, level LogLevel, format string, args ...interface{}) {
-	writeLog(ctx, LogLevelTrace, format, args)
+func Trace(ctx context.Context, format string, args ...interface{}) {
+	writeLog(ctx, LogLevelTrace, format, args...)
 }
 
-func Access(ctx context.Context, level LogLevel, format string, args ...interface{}) {
-	writeLog(ctx, LogLevelAccess, format, args)
+func Access(ctx context.Context, format string, args ...interface{}) {
+	writeLog(ctx, LogLevelAccess, format, args...)
 }
 
-func Info(ctx context.Context, level LogLevel, format string, args ...interface{}) {
-	writeLog(ctx, LogLevelInfo, format, args)
+func Info(ctx context.Context, format string, args ...interface{}) {
+	writeLog(ctx, LogLevelInfo, format, args...)
 }
 
-func Warn(ctx context.Context, level LogLevel, format string, args ...interface{}) {
-	writeLog(ctx, LogLevelWarn, format, args)
+func Warn(ctx context.Context, format string, args ...interface{}) {
+	writeLog(ctx, LogLevelWarn, format, args...)
 }
 
-func Error(ctx context.Context, level LogLevel, format string, args ...interface{}) {
-	writeLog(ctx, LogLevelError, format, args)
+func Error(ctx context.Context, format string, args ...interface{}) {
+	writeLog(ctx, LogLevelError, format, args...)
+}
+
+func Stop() {
+	close(lm.logDataChan)
+	lm.wg.Wait()
+
+	for _, outputer := range lm.outputers {
+		outputer.Close()
+	}
+
+	// 重新初始化
+	initOnce = &sync.Once{}
+	lm = nil
 }
 
 func writeLog(ctx context.Context, level LogLevel, format string, args ...interface{}) {
@@ -101,7 +114,7 @@ func writeLog(ctx context.Context, level LogLevel, format string, args ...interf
 	nowStr := now.Format("2006-01-02 15:04:05.999")
 	filename, lineNo := GetLineInfo()
 	filename = path.Base(filename)
-	msg := fmt.Sprintf(format, args)
+	msg := fmt.Sprintf(format, args...)
 
 	logData := &LogData{
 		curTime:     now,

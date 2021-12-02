@@ -6,7 +6,12 @@ prometheus:
   port: 8081
 service_name: {{.Package.Name}}
 register:
-  switch_on: false
+  switch_on: true
+  register_path: /koala/service/
+  timeout: 1s
+  heart_beat: 10
+  register_name: etcd
+  register_addr: 127.0.0.1:2379
 log:
   level: debug
   path: ./logs/
