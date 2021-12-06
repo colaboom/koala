@@ -18,7 +18,6 @@ type PluginMgr struct {
 }
 
 func (p *PluginMgr) registerPlugin(plugin Registry) (err error) {
-	fmt.Printf("this is duandian \n")
 	p.lock.Lock()
 	defer p.lock.Unlock()
 

@@ -18,4 +18,9 @@ log:
 limit:
   switch_on: true
   qps: 50000
+trace:
+  swith_on: true
+  report_addr: http:xxx.com
+  sample_type: const
+  sample_rate: 1
 `
