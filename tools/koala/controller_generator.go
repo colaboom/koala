@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/emicklei/proto"
+	"github.com/koala/util"
 	"os"
 	"path"
 	"text/template"
@@ -35,6 +36,9 @@ func (d *CtrlGenerator) generateRpc(opt *Option, metaData *ServiceMetaData) (err
 	for _, rpc := range metaData.Rpc {
 		var file *os.File
 		filename := path.Join(opt.Output, "controller", fmt.Sprintf("%s.go", rpc.Name))
+		if util.IsFileExist(filename) {
+			continue
+		}
 		file, err = os.OpenFile(filename, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
 		if err != nil {
 			fmt.Printf("open file %s failed, err : %v\n", filename, err)
