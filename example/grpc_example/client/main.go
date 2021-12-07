@@ -1,19 +1,11 @@
 package main
 
-import (
-	pb "github.com/koala/example/grpc_example/hello"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
-	"log"
-	"os"
-)
-
 const (
 	address     = "localhost:8080"
 	defaultName = "colaboom"
 )
 
-func main() {
+/*func main() {
 	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatal("did not connect, err :%v", err)
@@ -34,4 +26,4 @@ func main() {
 		log.Printf("Greeting: %s", resp.Reply)
 		//time.Sleep(time.Millisecond * 10)
 	}
-}
+}*/
