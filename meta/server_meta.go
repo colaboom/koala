@@ -2,6 +2,7 @@ package meta
 
 import "context"
 
+// TODO    server_meta和rpc_meta是用来干啥的
 type ServerMeta struct {
 	ServiceName string
 	Method      string
