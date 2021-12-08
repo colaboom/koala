@@ -47,5 +47,5 @@ func (d *MainGenerator) render(file *os.File, data string, metadata *ServiceMeta
 func init() {
 	dir := &MainGenerator{}
 
-	Register("main generator", dir)
+	RegisterServerGenerator("main generator", dir)
 }

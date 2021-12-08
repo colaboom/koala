@@ -26,7 +26,7 @@ func main() {
 		},
 		cli.BoolFlag{
 			Name:        "s",
-			Usage:       "generate grpc client code",
+			Usage:       "generate grpc server code",
 			Destination: &opt.GenServerCode,
 		},
 		cli.StringFlag{
