@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// TODO    server_meta和rpc_meta是用来干啥的
 type RpcMeta struct {
 	// 调用方名字
 	Caller string
@@ -35,7 +36,6 @@ type RpcMeta struct {
 
 type rpcMetaContextKey struct{}
 
-// TODO    server_meta和rpc_meta是用来干啥的
 func GetRpcMeta(ctx context.Context) *RpcMeta {
 	meta, ok := ctx.Value(rpcMetaContextKey{}).(*RpcMeta)
 	if !ok {
@@ -45,10 +45,11 @@ func GetRpcMeta(ctx context.Context) *RpcMeta {
 	return meta
 }
 
-func InitRpcMeta(ctx context.Context, service, method string) context.Context {
+func InitRpcMeta(ctx context.Context, service, method, caller string) context.Context {
 	meta := &RpcMeta{
 		Method:      method,
 		ServiceName: service,
+		Caller:      caller,
 	}
 
 	return context.WithValue(ctx, rpcMetaContextKey{}, meta)

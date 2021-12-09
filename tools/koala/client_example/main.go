@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/koala/rpc"
 	"github.com/koala/logs"
 	"github.com/koala/tools/koala/client_example/generate/client/helloc"
 	"github.com/koala/tools/koala/client_example/generate/hello"
@@ -10,7 +11,7 @@ import (
 )
 
 func myClientExample() {
-	client := helloc.NewHelloClient("hello")
+	client := helloc.NewHelloClient("hello", rpc.WithLimitQPS(5))
 	ctx := context.Background()
 	in := &hello.HelloRequest{Name: "client"}
 	resp, err := client.SayHello(ctx, in)

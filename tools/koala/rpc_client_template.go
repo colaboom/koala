@@ -13,22 +13,26 @@ import (
 
 type {{Capitalize .Package.Name}}Client struct {
 	serviceName string
+	client *rpc.KoalaClient
 }
 
-func New{{Capitalize .Package.Name}}Client(serviceName string) *{{Capitalize .Package.Name}}Client {
-	return &{{Capitalize .Package.Name}}Client{
+func New{{Capitalize .Package.Name}}Client(serviceName string, opts...rpc.RpcOptionFunc) *{{Capitalize .Package.Name}}Client {
+	c := &{{Capitalize .Package.Name}}Client{
 		serviceName: serviceName,
 	}
+	c.client = rpc.NewKoalaClient(serviceName, opts...)
+	return c
 }
 
 {{range .Rpc}}
 func (h *{{Capitalize $.Package.Name}}Client) {{.Name}}(ctx context.Context, in *{{$.Package.Name}}.{{.RequestType}}, opts ...grpc.CallOption) (*{{$.Package.Name}}.{{.ReturnsType}}, error) {
-	middlewareFunc := rpc.BuildClientMiddleware(mwClient{{.Name}})
+	/*middlewareFunc := rpc.BuildClientMiddleware(mwClient{{.Name}})
 	mkResp, err := middlewareFunc(ctx, in)
 	if err != nil {
 		return nil, err
-	}
+	}*/
 
+	mkResp, err := h.client.Call(ctx, "{{.Name}}", in, mwClient{{.Name}})
 	resp, ok := mkResp.(*{{$.Package.Name}}.{{.ReturnsType}})
 	if !ok {
 		err = fmt.Errorf("invalid resp, not *{{$.Package.Name}}.{{.ReturnsType}}")

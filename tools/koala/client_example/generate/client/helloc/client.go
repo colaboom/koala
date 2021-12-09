@@ -11,22 +11,26 @@ import (
 
 type HelloClient struct {
 	serviceName string
+	client *rpc.KoalaClient
 }
 
-func NewHelloClient(serviceName string) *HelloClient {
-	return &HelloClient{
+func NewHelloClient(serviceName string, opts...rpc.RpcOptionFunc) *HelloClient {
+	c := &HelloClient{
 		serviceName: serviceName,
 	}
+	c.client = rpc.NewKoalaClient(serviceName, opts...)
+	return c
 }
 
 
 func (h *HelloClient) SayHello(ctx context.Context, in *hello.HelloRequest, opts ...grpc.CallOption) (*hello.HelloResponse, error) {
-	middlewareFunc := rpc.BuildClientMiddleware(mwClientSayHello)
+	/*middlewareFunc := rpc.BuildClientMiddleware(mwClientSayHello)
 	mkResp, err := middlewareFunc(ctx, in)
 	if err != nil {
 		return nil, err
-	}
+	}*/
 
+	mkResp, err := h.client.Call(ctx, "SayHello", in, mwClientSayHello)
 	resp, ok := mkResp.(*hello.HelloResponse)
 	if !ok {
 		err = fmt.Errorf("invalid resp, not *hello.HelloResponse")
