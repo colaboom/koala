@@ -55,12 +55,15 @@ func NewKoalaClient(serviceName string, optfunc ...RpcOptionFunc) *KoalaClient {
 		}
 	})
 
+	client.register = globalRegister
+
 	return client
 }
 
 // TODO 为什么把serverMeta的serviceName作为caller
 func (k *KoalaClient) getCaller(ctx context.Context) string {
 	serverMeta := meta.GetServerMeta(ctx)
+	logs.Info(ctx,"serverMeta.ServiceName : %v", serverMeta.ServiceName)
 	if serverMeta == nil {
 		return ""
 	}
