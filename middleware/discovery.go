@@ -16,7 +16,6 @@ func NewDiscoveryMiddleware(discovery registry.Registry) Middleware {
 				return next(ctx, req)
 			}
 
-			logs.Info(ctx, "rpcMeta:%#v", *rpcMeta)
 			service, err := discovery.GetService(ctx, rpcMeta.ServiceName)
 			if err != nil {
 				logs.Error(ctx, "discovery service:%s failed, err :%v", rpcMeta.ServiceName, err)
