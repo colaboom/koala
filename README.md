@@ -7,4 +7,4 @@
   - 日志系统
   - 服务注册和服务发现
   - 过载保护（限流，熔断）
-  - 数据监控（prometheus + grafana）
+  - 数据可视化监控（prometheus + grafana）
