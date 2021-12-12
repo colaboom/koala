@@ -8,16 +8,37 @@ import (
 )
 
 type RandomBalance struct {
+	name string
+}
+
+func NewRandomBalance() LoadBalance {
+	return &RandomBalance{
+		name: "random",
+	}
 }
 
 func (b *RandomBalance) Name() string {
-	return "random"
+	return b.name
 }
 
 func (b *RandomBalance) Select(ctx context.Context, nodes []*registry.Node) (node *registry.Node, err error) {
 	nodesLen := len(nodes)
 	if nodesLen == 0 {
 		err = errno.NotHaveInstance
+	}
+
+	// 将节点加入到已选列表，
+	defer func() {
+		if node != nil {
+			SetSelectedNodes(ctx, node)
+		}
+	}()
+
+	// 筛掉已选过的节点，重试时避免再次选中
+	nodes = filterNodes(ctx, nodes)
+	if len(nodes) == 0 {
+		err = errno.AllNodeFailed
+		return
 	}
 
 	var totalWeight int
