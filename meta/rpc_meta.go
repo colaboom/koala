@@ -22,7 +22,7 @@ type RpcMeta struct {
 	Env string
 	// 调用方IDC
 	CallerIDC string
-	// 服务提供方ICD
+	// 服务提供方IDC
 	ServiceIDC string
 	// 当前节点
 	CurNode *registry.Node

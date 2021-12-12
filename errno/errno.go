@@ -3,7 +3,7 @@ package errno
 import "fmt"
 
 type KoalaError struct {
-	Code int
+	Code    int
 	Message string
 }
 
@@ -29,3 +29,16 @@ var (
 		Message: "all node failed",
 	}
 )
+
+func IsConnectError(err error) bool {
+	koalaError, ok := err.(*KoalaError)
+	if !ok {
+		return false
+	}
+
+	var ret bool
+	if koalaError == ConnFailed {
+		ret = true
+	}
+	return ret
+}

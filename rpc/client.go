@@ -2,6 +2,7 @@ package rpc
 
 import (
 	"context"
+	"github.com/koala/loadbalance"
 	"github.com/koala/logs"
 	"github.com/koala/meta"
 	"github.com/koala/middleware"
@@ -16,6 +17,7 @@ var globalRegister registry.Registry
 type KoalaClient struct {
 	opts     *RpcOptions
 	register registry.Registry
+	balance  loadbalance.LoadBalance
 }
 
 func NewKoalaClient(serviceName string, optfunc ...RpcOptionFunc) *KoalaClient {
@@ -33,6 +35,7 @@ func NewKoalaClient(serviceName string, optfunc ...RpcOptionFunc) *KoalaClient {
 			TraceSampleRate:   1,
 			ClientServiceName: "default",
 		},
+		balance: loadbalance.NewRandomBalance(),
 	}
 
 	for _, opt := range optfunc {
@@ -73,6 +76,7 @@ func (k *KoalaClient) getCaller(ctx context.Context) string {
 func (k *KoalaClient) buildMiddleware(handle middleware.MiddlewareFunc) middleware.MiddlewareFunc {
 	var mids []middleware.Middleware
 	mids = append(mids, middleware.NewDiscoveryMiddleware(k.register))
+	mids = append(mids, middleware.NewLoadBalance(k.balance))
 
 	m := middleware.Chain(mids[0], mids[1:]...)
 	return m(handle)
