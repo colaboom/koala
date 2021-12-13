@@ -77,6 +77,7 @@ func (k *KoalaClient) buildMiddleware(handle middleware.MiddlewareFunc) middlewa
 	var mids []middleware.Middleware
 	mids = append(mids, middleware.NewDiscoveryMiddleware(k.register))
 	mids = append(mids, middleware.NewLoadBalance(k.balance))
+	mids = append(mids, middleware.ShortConnectMiddleware)
 
 	m := middleware.Chain(mids[0], mids[1:]...)
 	return m(handle)

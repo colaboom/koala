@@ -17,11 +17,13 @@ func myClientExample() {
 	resp, err := client.SayHello(ctx, in)
 	if err != nil {
 		logs.Error(ctx, "could not greet :%v", err)
+		//logs.Stop()
 		return
 	}
 
 	logs.Info(ctx, "Greeting: %s", resp.Reply)
-	fmt.Printf("Greeting: %s", resp.Reply)
+	//logs.Stop()
+	fmt.Printf("Greeting: %s\n", resp.Reply)
 	return
 }
 

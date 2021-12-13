@@ -26,7 +26,7 @@ func NewLoadBalance(balancer loadbalance.LoadBalance) Middleware {
 					return
 				}
 				logs.Info(ctx, "selected node:%#v", rpcMeta.CurNode)
-				rpcMeta.HistoryNodes = append(rpcMeta.HistoryNodes, rpcMeta.CurNode)
+				rpcMeta.HistoryNodes = append(rpcMeta.HistoryNodes, rpcMeta .CurNode)
 				resp, err = next(ctx, req)
 				if err != nil {
 					// 连接错误的话，进行重试
