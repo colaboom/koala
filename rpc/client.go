@@ -66,7 +66,6 @@ func NewKoalaClient(serviceName string, optfunc ...RpcOptionFunc) *KoalaClient {
 // TODO 为什么把serverMeta的serviceName作为caller
 func (k *KoalaClient) getCaller(ctx context.Context) string {
 	serverMeta := meta.GetServerMeta(ctx)
-	logs.Info(ctx,"serverMeta.ServiceName : %v", serverMeta.ServiceName)
 	if serverMeta == nil {
 		return ""
 	}
@@ -75,6 +74,7 @@ func (k *KoalaClient) getCaller(ctx context.Context) string {
 
 func (k *KoalaClient) buildMiddleware(handle middleware.MiddlewareFunc) middleware.MiddlewareFunc {
 	var mids []middleware.Middleware
+	mids = append(mids, middleware.HystrixMiddleware)
 	mids = append(mids, middleware.NewDiscoveryMiddleware(k.register))
 	mids = append(mids, middleware.NewLoadBalance(k.balance))
 	mids = append(mids, middleware.ShortConnectMiddleware)
